@@ -8,22 +8,54 @@ module Git
     end
 
     def repos(page, per_page: 100)
-      endpoint = "#{@url}/users/#{@username}/repos?page=#{page}&per_page=#{per_page}"
-
-      url = URI(endpoint)
-      http = Net::HTTP.new(url.host, url.port)
-      http.use_ssl = true
-      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-
-      request = Net::HTTP::Get.new(url)
-      request["Accept"] = "application/vnd.github.v3+json"
-
+      opts = {
+        page: page,
+        per_page: per_page
+      }
+      uri = create_uri("users/#{@username}/repos", opts)
+      http = create_http(uri)
+      request = create_request(uri, method: :get)
       response = http.request(request)
+      parse_body(response)
+    end
 
+    def create_repo(name)
+      uri = create_uri("user/repos")
+      http = create_http(uri)
+      request = create_request(uri, method: :post, body: {name: name})
+      response = http.request(request)
       parse_body(response)
     end
 
     private
+
+    def create_uri(endpoint, opts = {})
+      url = "#{@url}/#{endpoint}?"
+      opts.each do |key, value|
+        url += "#{key}=#{value}&"
+      end
+      puts url
+      puts "---"
+      URI(url)
+    end
+
+    def create_http(uri)
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      http
+    end
+
+    def create_request(uri, method:, body: nil)
+      request = "Net::HTTP::#{method.capitalize}".constantize.new(uri)
+      request["Accept"] = "application/vnd.github.v3+json"
+      request["Authorization"] = "token #{@token}"
+      if body.present?
+        request['Content-Type'] = 'application/json'
+        request.body = body.to_json
+      end
+      request
+    end
 
     def parse_body(response, format: :json)
       if format == :json
