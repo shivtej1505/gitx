@@ -28,8 +28,7 @@ module Git
     def create_request(uri, method:, body: nil, headers: {})
       request = "Net::HTTP::#{method.capitalize}".constantize.new(uri)
       request = add_headers(request, headers)
-      request = add_body(request, body)
-      request
+      add_body(request, body)
     end
 
     def opts_url(opts)

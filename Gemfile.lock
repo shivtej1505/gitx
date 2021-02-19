@@ -68,12 +68,16 @@ GEM
       minitest (>= 5.1)
       tzinfo (~> 2.0)
       zeitwerk (~> 2.3)
+    addressable (2.7.0)
+      public_suffix (>= 2.0.2, < 5.0)
     ast (2.4.2)
     bootsnap (1.7.2)
       msgpack (~> 1.0)
     builder (3.2.4)
     byebug (11.1.3)
     concurrent-ruby (1.1.8)
+    crack (0.4.5)
+      rexml
     crass (1.0.6)
     diff-lcs (1.4.4)
     erubi (1.10.0)
@@ -85,6 +89,7 @@ GEM
     ffi (1.14.2)
     globalid (0.4.2)
       activesupport (>= 4.2.0)
+    hashdiff (1.0.1)
     i18n (1.8.9)
       concurrent-ruby (~> 1.0)
     listen (3.4.1)
@@ -110,6 +115,7 @@ GEM
     parallel (1.20.1)
     parser (3.0.0.0)
       ast (~> 2.4.1)
+    public_suffix (4.0.6)
     puma (5.2.1)
       nio4r (~> 2.0)
     racc (1.5.2)
@@ -197,6 +203,10 @@ GEM
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.0.0)
+    webmock (3.11.2)
+      addressable (>= 2.3.6)
+      crack (>= 0.3.2)
+      hashdiff (>= 0.4.0, < 2.0.0)
     websocket-driver (0.7.3)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
@@ -218,6 +228,7 @@ DEPENDENCIES
   sqlite3 (~> 1.4)
   standard
   tzinfo-data
+  webmock
 
 RUBY VERSION
    ruby 2.6.6p146
