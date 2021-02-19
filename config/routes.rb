@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  scope '/api' do
+  scope "/api" do
     get "/*path", to: "proxy#index"
     post "/*path", to: "proxy#index"
     put "/*path", to: "proxy#index"

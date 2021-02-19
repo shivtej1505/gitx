@@ -35,9 +35,9 @@ module Git
     def opts_url(opts)
       url = ""
       if opts.present?
-        opts_url = "?"
+        url = "?"
         opts.each do |key, value|
-          opts_url += "#{key}=#{value}&"
+          url += "#{key}=#{value}&"
         end
       end
       url
