@@ -1,41 +1,21 @@
 module Git
   class Session
     def initialize
-      @username = "shivtej1505"
       @token = "072f611f44a2da38993e1353fd12fa5e4f2f1e18"
       @url = "https://api.github.com"
-      super
     end
 
-    def repos(page, per_page: 100)
-      opts = {
-        page: page,
-        per_page: per_page
-      }
-      uri = create_uri("users/#{@username}/repos", opts)
+    def do_request(endpoint:, method:, body: {}, opts: {}, headers: {})
+      uri = create_uri(endpoint, opts)
       http = create_http(uri)
-      request = create_request(uri, method: :get)
-      response = http.request(request)
-      parse_body(response)
-    end
-
-    def create_repo(name)
-      uri = create_uri("user/repos")
-      http = create_http(uri)
-      request = create_request(uri, method: :post, body: {name: name})
-      response = http.request(request)
-      parse_body(response)
+      request = create_request(uri, method: method, body: body)
+      http.request(request)
     end
 
     private
 
     def create_uri(endpoint, opts = {})
-      url = "#{@url}/#{endpoint}?"
-      opts.each do |key, value|
-        url += "#{key}=#{value}&"
-      end
-      puts url
-      puts "---"
+      url = "#{@url}/#{endpoint}#{opts_url(opts)}"
       URI(url)
     end
 
@@ -51,16 +31,21 @@ module Git
       request["Accept"] = "application/vnd.github.v3+json"
       request["Authorization"] = "token #{@token}"
       if body.present?
-        request['Content-Type'] = 'application/json'
+        request["Content-Type"] = "application/json"
         request.body = body.to_json
       end
       request
     end
 
-    def parse_body(response, format: :json)
-      if format == :json
-        JSON.parse(response.read_body)
+    def opts_url(opts)
+      url = ""
+      if opts.present?
+        opts_url = "?"
+        opts.each do |key, value|
+          opts_url += "#{key}=#{value}&"
+        end
       end
+      url
     end
   end
 end
