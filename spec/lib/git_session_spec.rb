@@ -1,102 +1,94 @@
 require "rails_helper"
 
-def headers
-  token = Faker::Lorem.characters(number: 40)
-  {
-    "Authorization": "token #{token}",
-    "Accept": "application/vnd.github.v3+json"
-  }
+def request_params(only_post_kind: false)
+  endpoint =  FactoryBot.build(:endpoint)
+  if only_post_kind
+    method = [:put, :post, :delete, :patch].sample
+  else
+    method = [:get, :put, :post, :delete, :patch].sample
+  end
+  request_headers = FactoryBot.build(:headers)
+  [
+    endpoint,
+    method,
+    request_headers
+  ]
+end
+
+def stub_github_request(method, endpoint)
+  stub_request(method, "https://api.github.com/#{endpoint}")
 end
 
 RSpec.describe Git::Session do
-  describe "GET on/some/random/endpoint" do
-    context "when requested with no params" do
-      it "hit Github url with correct header and returns correct response" do
-        endpoint = "on/some/random/endpoint"
-        method = "GET"
-        request_headers = headers
+  describe "GET/PUT/POST/DELETE/PATCH on randomly generated endpoint" do
+    1.upto(20) do
+      context "when requested with randomly selected verb" do
+        it "hit correct url with correct header" do
+          # setup
+          endpoint, method, request_headers = request_params
+          stub_github_request(method, endpoint)
 
-        # Stub request
-        stub_request(:get, "https://api.github.com/#{endpoint}")
+          # test
+          git = Git::Session.new
+          git.do_request(endpoint: endpoint, method: method, headers: request_headers)
 
-        git = Git::Session.new
-        git.do_request(endpoint: endpoint, method: method, headers: request_headers)
-
-        expect(WebMock).to have_requested(:get, "https://api.github.com/#{endpoint}").with(headers: request_headers)
+          # except
+          expect(WebMock).to have_requested(method, "https://api.github.com/#{endpoint}").with(headers: request_headers)
+        end
       end
-    end
 
-    context "when requested with params" do
-      it "hit Github url with correct header, params and returns correct response" do
-        endpoint = "on/some/random/endpoint"
-        method = "GET"
-        opts = {
-          per_page: 30,
-          page: 1
-        }
-        request_headers = headers
+      context "when requested with randomly selected verb with params" do
+        it "hit correct url with params" do
+          # setup
+          endpoint, method, request_headers = request_params
+          opts = Faker::Types.rb_hash
+          stub_github_request(method, endpoint).with(query: opts)
 
-        # Stub request
-        stub_request(:get, "https://api.github.com/#{endpoint}").with(query: opts)
+          # test
+          git = Git::Session.new
+          git.do_request(endpoint: endpoint, method: method, headers: request_headers, opts: opts)
 
-        git = Git::Session.new
-        git.do_request(endpoint: endpoint, method: method, headers: request_headers, opts: opts)
-
-        expect(WebMock).to have_requested(:get, "https://api.github.com/#{endpoint}").with(query: opts, headers: request_headers)
+          # except
+          expect(WebMock).to have_requested(method, "https://api.github.com/#{endpoint}").with(query: opts, headers: request_headers)
+        end
       end
-    end
-  end
 
-  describe "POST on/some/resource" do
-    context "when requested with valid body" do
-      it "hit Github url with correct header, params and get successful response" do
-        endpoint = "on/some/resource"
-        method = "POST"
-        request_body = {
-          name: "random_name"
-        }
-        request_headers = headers
+      context "when requested with randomly selected verb with body" do
+        it "hit correct url with correct body" do
+          # setup
+          endpoint, method, request_headers = request_params(only_post_kind: true)
+          body = Faker::Types.rb_hash
+          stub_github_request(method, endpoint).with(body: body)
 
-        expected_response_body = {
-          message: "Resource updated successfully"
-        }
+          # test
+          git = Git::Session.new
+          git.do_request(endpoint: endpoint, method: method, headers: request_headers, body: body)
 
-        # Stub request
-        stub_request(:post, "https://api.github.com/#{endpoint}").to_return(body: expected_response_body.to_json)
-
-        git = Git::Session.new
-        response = git.do_request(endpoint: endpoint, method: method, headers: request_headers, body: request_body)
-
-        expect(WebMock).to have_requested(:post, "https://api.github.com/#{endpoint}").with(headers: request_headers)
-        expect(response.read_body).to eq(expected_response_body.to_json)
+          # except
+          expect(WebMock).to have_requested(method, "https://api.github.com/#{endpoint}")
+                               .with(headers: request_headers, body: body)
+        end
       end
-    end
 
-    context "when requested with invalid body" do
-      it "hit Github url with correct header, params and get unprocessable response" do
-        endpoint = "on/some/random/endpoint"
-        method = "POST"
-        opts = {
-          per_page: 30,
-          page: 1
-        }
-        request_headers = headers
+      context "when requested with randomly selected verb" do
+        it "hit correct url with correct header and return correct response & status" do
+          # setup
+          endpoint, method, request_headers = request_params
+          expected_response_body = Faker::Types.rb_hash
+          expected_status = FactoryBot.build(:status_code)
 
-        expected_response_body = {
-          message: "Invalid request body"
-        }
+          stub_github_request(method, endpoint)
+            .to_return(body: expected_response_body.to_json, status: expected_status, headers: request_headers)
 
-        # Stub request
-        stub_request(:post, "https://api.github.com/#{endpoint}")
-          .with(query: opts)
-          .to_return(body: expected_response_body.to_json, status: 422, headers: request_headers)
+          # test
+          git = Git::Session.new
+          response = git.do_request(endpoint: endpoint, method: method, headers: request_headers)
 
-        git = Git::Session.new
-        response = git.do_request(endpoint: endpoint, method: method, headers: request_headers, opts: opts)
-
-        expect(WebMock).to have_requested(:post, "https://api.github.com/#{endpoint}").with(query: opts, headers: request_headers)
-        expect(response.read_body).to eq(expected_response_body.to_json)
-        expect(response.code.to_i).to eq(422)
+          # except
+          expect(WebMock).to have_requested(method, "https://api.github.com/#{endpoint}").with(headers: request_headers)
+          expect(response.read_body).to eq(expected_response_body.to_json)
+          expect(response.code.to_i).to eq(expected_status)
+        end
       end
     end
   end
