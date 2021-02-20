@@ -27,7 +27,7 @@ SimpleCov.start "rails" do
   add_filter "/app/controllers/application_controller.rb"
 end
 
-WebMock.disable_net_connect!(allow_localhost: true)
+WebMock.disable_net_connect!
 
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate
