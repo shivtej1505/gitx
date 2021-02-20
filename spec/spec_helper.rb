@@ -14,7 +14,19 @@
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
+require "simplecov"
 require "webmock/rspec"
+
+SimpleCov.start "rails" do
+  add_filter "/config/"
+  add_filter "/app/jobs/"
+  add_filter "/app/mailers/"
+  add_filter "/app/helpers/"
+  add_filter "/app/channels/"
+  add_filter "/app/models/"
+  add_filter "/app/controllers/application_controller.rb"
+end
+
 WebMock.disable_net_connect!(allow_localhost: true)
 
 RSpec.configure do |config|
