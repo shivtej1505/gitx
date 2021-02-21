@@ -20,3 +20,7 @@ curl -i \
   -H "Authorization: token <your-token-here>" \
   http://localhost:3000/api/user/repos
 ```
+
+### Project Doc & Other details
+
+https://www.notion.so/shivangnagaria/GitX-Project-Doc-0c9df395a68e4dc3a547f7cce658ab96
