@@ -1,7 +1,8 @@
 module ExternalApi
   class Base
-    def initialize(base_url:)
+    def initialize(base_url:, use_ssl: false)
       @base_url = base_url
+      @use_ssl = use_ssl
     end
 
     def do_request(endpoint:, method:, body: {}, opts: {}, headers: {})
@@ -19,7 +20,9 @@ module ExternalApi
     end
 
     def create_http(uri)
-      Net::HTTP.new(uri.host, uri.port)
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true if @use_ssl
+      http
     end
 
     def create_request(uri, method:, body: nil, headers: {})

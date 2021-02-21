@@ -6,5 +6,15 @@ FactoryBot.define do
     }
 
     initialize_with { defaults.merge(attributes) }
+
+    factory :headers_with_auth_token
+  end
+
+  factory :headers_without_auth_token, class: Hash do
+    defaults = {
+      "Accept": "application/vnd.github.v3+json"
+    }
+
+    initialize_with { defaults.merge(attributes) }
   end
 end
