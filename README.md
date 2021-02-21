@@ -1,24 +1,22 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+### Dependencies
 
-Things you may want to cover:
+* Ruby version: 2.6.6
 
-* Ruby version
+### Setup
 
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+* `git clone https://github.com/shivtej1505/gitx.git`
+* `cd gitx`
+* `bundle install`
+* Run tests: `bundle exec rspec`
+* Start server: `bin/rails s`
+* Make a curl request
+  
+```
+curl -i \
+  -X GET \
+  -H "Accept: application/vnd.github.v3+json" \
+  -H "Authorization: token <your-token-here>" \
+  http://localhost:3000/api/user/repos
+```

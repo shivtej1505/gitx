@@ -9,6 +9,7 @@ class ProxyController < ActionController::API
   end
 
   private
+
   def parse_proxy_params(request, params)
     {
       endpoint: params[:path],
