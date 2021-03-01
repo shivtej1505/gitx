@@ -24,7 +24,7 @@ module ProxyHelper
   end
 
   def parse_response_body(response)
-    if response.read_body.present? && !response.read_body.present?.blank?
+    if response.read_body.present? && !response.read_body.blank?
       return JSON.parse(response.read_body)
     end
     {}
