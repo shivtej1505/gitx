@@ -18,7 +18,7 @@ curl -i \
   -X GET \
   -H "Accept: application/vnd.github.v3+json" \
   -H "Authorization: token <your-token-here>" \
-  http://localhost:3000/api/user/repos
+  http://localhost:3000/github/api/user/repos
 ```
 
 ### Project Doc & Other details
