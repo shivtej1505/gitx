@@ -45,7 +45,7 @@ module ExternalApi
 
       # Run it inside block & close connection
       # @connection.close
-      response
+      # response
     end
 
     private

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ProxyHelper
   def parse_body(request)
     if request.form_data? && !request.raw_post.blank?
@@ -8,6 +10,7 @@ module ProxyHelper
 
   def parse_headers(request)
     headers = {}
+    # TODO: Only taking these headers? Don't think this is good
     %w[Accept Authorization].each do |key|
       headers[key] = request.headers[key] if request.headers.key?(key)
     end
@@ -17,6 +20,7 @@ module ProxyHelper
   def parse_opts(params)
     opts = {}
     params.each do |key, value|
+      # TODO: What if in new Rails version they add more keyword with request. Then we need to change this code, right?
       next if %w[controller action path].include?(key)
       opts[key] = value
     end
