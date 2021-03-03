@@ -5,23 +5,27 @@ require "rails_helper"
 RSpec.describe ProxyController, "as Github Proxy" do
   github_api_base_url = "https://api.github.com"
   WebMock.allow_net_connect!(allow: github_api_base_url)
+
   describe "when requested to list down repositories from a user's account" do
+    before(:each) do
+      @endpoint = "user/repos"
+      @github_url = github_api_base_url + "/" + @endpoint
+    end
+
     context "without passing Auth header" do
       it "make request to Github API endpoint without Auth header" do
         # setup
-        endpoint = "user/repos"
         request_headers = FactoryBot.build(:headers_without_auth_token)
-        github_endpoint = github_api_base_url + "/" + endpoint
 
         # test
         request_headers.each do |key, value|
           request.headers[key] = value
         end
 
-        get :index, params: {path: endpoint}
+        get :index, params: {path: @endpoint}
 
         # expect
-        expect(a_request(:get, github_endpoint)
+        expect(a_request(:get, @github_url)
                  .with(headers: request_headers)).to have_been_made.once
       end
     end
@@ -29,18 +33,16 @@ RSpec.describe ProxyController, "as Github Proxy" do
     context "with Auth header" do
       it "make request to Github API endpoint with Auth header" do
         # setup
-        endpoint = "user/repos"
         request_headers = FactoryBot.build(:headers_with_auth_token)
-        github_endpoint = github_api_base_url + "/" + endpoint
 
         # test
         request_headers.each do |key, value|
           request.headers[key] = value
         end
-        get :index, params: {path: endpoint}
+        get :index, params: {path: @endpoint}
 
         # expect
-        expect(a_request(:get, github_endpoint)
+        expect(a_request(:get, @github_url)
                  .with(headers: request_headers)).to have_been_made.once
       end
     end
@@ -48,20 +50,18 @@ RSpec.describe ProxyController, "as Github Proxy" do
     context "with params" do
       it "make request to Github API endpoint with passed params" do
         # setup
-        endpoint = "user/repos"
         request_headers = FactoryBot.build(:headers_with_auth_token)
-        github_endpoint = github_api_base_url + "/" + endpoint
-        opts = Faker::Types.rb_hash
+        params = Faker::Types.rb_hash
 
         # test
         request_headers.each do |key, value|
           request.headers[key] = value
         end
-        get :index, params: {path: endpoint}.merge!(opts)
+        get :index, params: {path: @endpoint}.merge!(params)
 
         # expect
-        expect(a_request(:get, github_endpoint)
-                 .with(query: opts).with(headers: request_headers)).to have_been_made.once
+        expect(a_request(:get, @github_url)
+                 .with(query: params).with(headers: request_headers)).to have_been_made.once
       end
     end
   end
