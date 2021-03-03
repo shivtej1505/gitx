@@ -28,14 +28,13 @@ RSpec.describe ExternalApi::Base do
       end
 
       context "when requested" do
-        it "hit correct url with correct header and return correct response & status" do
+        it "hit correct url with correct header and return correct response" do
           # setup
           endpoint, request_headers = request_params
           expected_response_body = Faker::Types.rb_hash
-          expected_status = FactoryBot.build(:status_code)
 
           stub_request_with_base_url(method, base_url, endpoint)
-            .to_return(body: expected_response_body.to_json, status: expected_status, headers: request_headers)
+            .to_return(body: expected_response_body.to_json, headers: request_headers)
 
           # test
           ext_api = init_ext_api(base_url)
@@ -45,7 +44,6 @@ RSpec.describe ExternalApi::Base do
           # except
           expect(WebMock).to have_requested(method, "#{base_url}/#{endpoint}").with(headers: request_headers)
           expect(response.body).to eq(expected_response_body.to_json)
-          expect(response.status).to eq(expected_status)
         end
       end
     end
