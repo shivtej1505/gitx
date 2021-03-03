@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe ProxyController, 'as Github Proxy' do
+RSpec.describe ProxyController, "as Github Proxy" do
   github_api_base_url = "https://api.github.com"
   WebMock.allow_net_connect!(allow: github_api_base_url)
   describe "when requested to list down repositories from a user's account" do

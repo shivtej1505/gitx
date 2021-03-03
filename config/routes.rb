@@ -1,10 +1,7 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
-  # TODO: Only allow Git endpoints for now and block others??
-  # Do I need to specify content-type? (format: json) or is it not required?
-  # Versioning??
-  scope "/api" do
+  scope "/github/api" do
     get "/*path", to: "proxy#index"
     post "/*path", to: "proxy#index"
     put "/*path", to: "proxy#index"
