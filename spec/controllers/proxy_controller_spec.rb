@@ -1,7 +1,10 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 RSpec.describe ProxyController do
   github_api_base_url = "https://api.github.com"
+  # TODO: Should it actually make real request to github
   WebMock.allow_net_connect!(allow: github_api_base_url)
   describe "Github proxy when requested to list down repositories from a user's account" do
     context "without auth token" do

@@ -1,11 +1,12 @@
+# frozen_string_literal: true
+
 class ProxyController < ActionController::API
   include ProxyHelper
 
   def index
     git = Git::Session.new
-    response = git.do_request(parse_proxy_params(request, params))
-    response_body = parse_response_body(response)
-    render json: response_body, status: response.code.to_i
+    response = git.make_request(parse_proxy_params(request, params))
+    render json: response.body, status: response.status
   end
 
   private
@@ -13,10 +14,10 @@ class ProxyController < ActionController::API
   def parse_proxy_params(request, params)
     {
       endpoint: params[:path],
-      method: request.method,
-      body: parse_body(request),
+      method: request.method.downcase.to_sym, # Is downcasing & to_sym cool?
+      body: JSON.generate(parse_body(request)), # not so good way I guess
       headers: parse_headers(request),
-      opts: parse_opts(params)
+      params: parse_opts(params)
     }
   end
 end
