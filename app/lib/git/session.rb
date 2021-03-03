@@ -3,7 +3,7 @@
 module Git
   class Session < ExternalApi::Base
     def initialize
-      # TODO: Should we hardcode this URL?
+      # Ideally, this base_url should be fetched from environment
       super(base_url: "https://api.github.com")
     end
   end

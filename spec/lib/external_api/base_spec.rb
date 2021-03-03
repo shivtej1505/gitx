@@ -80,3 +80,29 @@ RSpec.describe ExternalApi::Base do
     end
   end
 end
+
+RSpec.describe ExternalApi::Base, "Invalid HTTP method" do
+  before(:each) do
+    @base_url = Faker::Internet.url(path: nil)
+    @endpoint = FactoryBot.build(:endpoint)
+    @api_client = ExternalApi::Base.new(base_url: @base_url)
+  end
+
+  context "when invalid method is passed" do
+    it "throws Argument Error" do
+      expect {
+        invalid_method = "GUT".to_sym
+        @api_client.make_request(endpoint: @endpoint, method: invalid_method)
+      }.to raise_error(ArgumentError)
+    end
+  end
+
+  context "when method with invalid class is passed" do
+    it "throws Argument Error" do
+      expect {
+        invalid_method = "GUT"
+        @api_client.make_request(endpoint: @endpoint, method: invalid_method)
+      }.to raise_error(ArgumentError)
+    end
+  end
+end
