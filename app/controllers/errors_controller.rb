@@ -13,5 +13,3 @@ class ErrorsController < ActionController::API
     }, status: :internal_server_error
   end
 end
-
-

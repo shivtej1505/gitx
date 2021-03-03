@@ -40,6 +40,6 @@ module Gitx
     config.api_only = true
 
     # Route exceptions to our own controller
-    config.exceptions_app = self.routes
+    config.exceptions_app = routes
   end
 end
