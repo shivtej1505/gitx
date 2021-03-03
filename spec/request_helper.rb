@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# TODO: Should we keep this function inside a module??
 def request_params
   endpoint = FactoryBot.build(:endpoint)
   request_headers = FactoryBot.build(:headers)
@@ -10,10 +11,8 @@ def request_params
 end
 
 def base_url_generator
-  # Should we test for both http & https?
-  # No, we are not testing Faraday, we are testing our code. It is out of scope
-  url = Faker::Internet.url(scheme: "https")
-  url.gsub(/\/[a-zA-Z0-9]+$/, "")
+  url = Faker::Internet.url
+  url.gsub(/\/[a-zA-Z0-9]+$/, "") # what are we doing here? We are removing anything after last `/`
 end
 
 def stub_request_with_base_url(method, base_url, endpoint)

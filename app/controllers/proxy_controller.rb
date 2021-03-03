@@ -5,19 +5,20 @@ class ProxyController < ActionController::API
 
   def index
     git = Git::Session.new
-    response = git.make_request(parse_proxy_params(request, params))
+    response = git.make_request(proxy_request_params)
     render json: response.body, status: response.status
   end
 
   private
-
-  def parse_proxy_params(request, params)
+  # TODO: Can we directly pass request to Git::Session & let it figure out stuff?
+  # we are actually parsing request & params to get what we need
+  def proxy_request_params
     {
       endpoint: params[:path],
-      method: request.method.downcase.to_sym, # Is downcasing & to_sym cool?
-      body: JSON.generate(parse_body(request)), # not so good way I guess
+      method: normalize_method(request.method),
+      body: request.raw_post, # Pass whatever body you get from request
       headers: parse_headers(request),
-      params: parse_opts(params)
+      params: parse_query_params(params)
     }
   end
 end

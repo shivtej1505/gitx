@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  # TODO: Only allow Git endpoints for now and block others??
   scope "/api" do
     get "/*path", to: "proxy#index"
     post "/*path", to: "proxy#index"

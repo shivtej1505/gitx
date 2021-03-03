@@ -1,36 +1,37 @@
 # frozen_string_literal: true
 
 module ProxyHelper
-  def parse_body(request)
-    if request.form_data? && !request.raw_post.blank?
-      return JSON.parse(request.raw_post)
-    end
-    {}
-  end
-
+  # Only taking Accept & Authorization header
+  # As Rails is mixing its own headers, it is not possible to distinguish between user defined & rails defined headers
   def parse_headers(request)
     headers = {}
-    # TODO: Only taking these headers? Don't think this is good
+    # is it mutability?
     %w[Accept Authorization].each do |key|
       headers[key] = request.headers[key] if request.headers.key?(key)
     end
     headers
   end
 
-  def parse_opts(params)
-    opts = {}
+  # As Rails is adding its own keywords in params and we will never be sure of complete list,
+  # we will need to update this code if the list changes in future
+  def parse_query_params(params)
+    query_params = {}
+    # is it mutability?
     params.each do |key, value|
-      # TODO: What if in new Rails version they add more keyword with request. Then we need to change this code, right?
       next if %w[controller action path].include?(key)
-      opts[key] = value
+      query_params[key] = value
     end
-    opts
+    query_params
   end
 
-  def parse_response_body(response)
-    if response.read_body.present? && !response.read_body.blank?
-      return JSON.parse(response.read_body)
+  # What is the meaning of normalize here?
+  # 1. We are downcase-ing given string
+  # 2. We are converting it to symbol
+  def normalize_method(method)
+    unless method.is_a?(String)
+      raise ArgumentError, "Invalid method type. Expected String, found #{method.class}"
     end
-    {}
+    # Is it mutation?
+    method.downcase.to_sym
   end
 end
