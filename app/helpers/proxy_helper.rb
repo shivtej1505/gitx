@@ -3,6 +3,8 @@
 module ProxyHelper
   # Only taking Accept & Authorization header
   # As Rails is mixing its own headers, it is not possible to distinguish between user defined & rails defined headers
+  # Also, we can't ask user to only send Accept & Authorization headers when they send other kind of headers because
+  # we don't know if they are actually sent by the user or set by Rails
   def parse_headers(request)
     headers = {}
     # is it mutability?
