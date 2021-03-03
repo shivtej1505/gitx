@@ -22,7 +22,6 @@ RSpec.describe ExternalApi::Base do
           api_client.make_request(endpoint: @endpoint, method: method, headers: @headers)
 
           # verify
-          # TODO: Other headers are also coming (User-Agent, Accept-Encoding, etc). What to do about it?
           expect(WebMock).to have_requested(method, @url).with(headers: @headers)
         end
 
@@ -75,7 +74,6 @@ RSpec.describe ExternalApi::Base do
           api_client.make_request(endpoint: @endpoint, method: method, headers: @headers, body: body)
 
           # verify
-          # TODO: Make it one_time
           expect(WebMock).to have_requested(method, @url).with(headers: @headers, body: body)
         end
       end

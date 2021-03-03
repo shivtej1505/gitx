@@ -2,13 +2,12 @@
 
 require "rails_helper"
 
-RSpec.describe ProxyController do
+RSpec.describe ProxyController, 'as Github Proxy' do
   github_api_base_url = "https://api.github.com"
-  # TODO: Should it actually make real request to github
   WebMock.allow_net_connect!(allow: github_api_base_url)
-  describe "Github proxy when requested to list down repositories from a user's account" do
-    context "without auth token" do
-      it "make request to Github api endpoint without auth token" do
+  describe "when requested to list down repositories from a user's account" do
+    context "without passing Auth header" do
+      it "make request to Github API endpoint without Auth header" do
         # setup
         endpoint = "user/repos"
         request_headers = FactoryBot.build(:headers_without_auth_token)
@@ -22,12 +21,13 @@ RSpec.describe ProxyController do
         get :index, params: {path: endpoint}
 
         # expect
-        expect(a_request(:get, github_endpoint).with(headers: request_headers)).to have_been_made.once
+        expect(a_request(:get, github_endpoint)
+                 .with(headers: request_headers)).to have_been_made.once
       end
     end
 
-    context "with auth token" do
-      it "make request to Github api endpoint with auth token" do
+    context "with Auth header" do
+      it "make request to Github API endpoint with Auth header" do
         # setup
         endpoint = "user/repos"
         request_headers = FactoryBot.build(:headers_with_auth_token)
@@ -40,12 +40,13 @@ RSpec.describe ProxyController do
         get :index, params: {path: endpoint}
 
         # expect
-        expect(a_request(:get, github_endpoint).with(headers: request_headers)).to have_been_made.once
+        expect(a_request(:get, github_endpoint)
+                 .with(headers: request_headers)).to have_been_made.once
       end
     end
 
     context "with params" do
-      it "make request to Github api endpoint with correct params" do
+      it "make request to Github API endpoint with passed params" do
         # setup
         endpoint = "user/repos"
         request_headers = FactoryBot.build(:headers_with_auth_token)
@@ -59,14 +60,15 @@ RSpec.describe ProxyController do
         get :index, params: {path: endpoint}.merge!(opts)
 
         # expect
-        expect(a_request(:get, github_endpoint).with(query: opts).with(headers: request_headers)).to have_been_made.once
+        expect(a_request(:get, github_endpoint)
+                 .with(query: opts).with(headers: request_headers)).to have_been_made.once
       end
     end
   end
 
-  describe "Github proxy when requested to create a repository" do
+  describe "when requested to create a repository" do
     context "on a user's behalf with given auth token" do
-      it "make request to Github api endpoint with correct headers & body" do
+      it "make request to Github API endpoint with correct headers and body" do
         # setup
         endpoint = "user/repos"
         request_headers = FactoryBot.build(:headers_with_auth_token)
@@ -88,9 +90,9 @@ RSpec.describe ProxyController do
     end
   end
 
-  describe "Github proxy when requested to update a repository" do
+  describe "when requested to update a repository" do
     context "on a user's behalf with given auth token and body" do
-      it "make request to Github api endpoint with correct headers & body" do
+      it "make request to Github API endpoint with correct headers and body" do
         # setup
         owner_endpoint = FactoryBot.build(:endpoint, {nesting_level: 2})
         endpoint = "repos/#{owner_endpoint}"
@@ -114,9 +116,9 @@ RSpec.describe ProxyController do
     end
   end
 
-  describe "Github proxy when requested to update topics of a repository" do
+  describe "when requested to update topics of a repository" do
     context "on a user's behalf with given auth token and body" do
-      it "make request to Github api endpoint with correct headers & body" do
+      it "make request to Github API endpoint with correct headers and body" do
         # setup
         owner_endpoint = FactoryBot.build(:endpoint, {nesting_level: 2})
         endpoint = "repos/#{owner_endpoint}/topics"
@@ -139,9 +141,9 @@ RSpec.describe ProxyController do
     end
   end
 
-  describe "Github proxy when requested to enable vulnerability alerts" do
+  describe "when requested to enable vulnerability alerts" do
     context "on a user's behalf with given auth token" do
-      it "make request to Github api endpoint with correct headers" do
+      it "make request to Github API endpoint with correct headers" do
         # setup
         owner_endpoint = FactoryBot.build(:endpoint, {nesting_level: 2})
         endpoint = "repos/#{owner_endpoint}/vulnerability-alerts"
@@ -161,9 +163,9 @@ RSpec.describe ProxyController do
     end
   end
 
-  describe "Github proxy when requested to delete a repository" do
+  describe "when requested to delete a repository" do
     context "on a user's behalf with given auth token" do
-      it "make request to Github api endpoint with correct headers" do
+      it "make request to Github API endpoint with correct headers" do
         # setup
         owner_endpoint = FactoryBot.build(:endpoint, {nesting_level: 2})
         endpoint = "repos/#{owner_endpoint}"
