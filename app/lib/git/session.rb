@@ -1,7 +1,10 @@
+# frozen_string_literal: true
+
 module Git
   class Session < ExternalApi::Base
     def initialize
-      super(base_url: "https://api.github.com", use_ssl: true)
+      # TODO: Should we hardcode this URL?
+      super(base_url: "https://api.github.com")
     end
   end
 end

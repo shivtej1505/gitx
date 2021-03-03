@@ -1,60 +1,70 @@
+# frozen_string_literal: true
+
 module ExternalApi
+  # We could have assigned variable from Faraday's variable. Why didn't we do that?
+  METHODS = [:get, :post, :put, :delete, :head, :patch].freeze
+  METHODS_WITH_PARAMS = [:get, :head, :delete].freeze
+  METHODS_WITH_BODY = [:post, :put, :patch].freeze
+
   class Base
-    def initialize(base_url:, use_ssl: false)
-      @base_url = base_url
-      @use_ssl = use_ssl
+    def initialize(base_url:)
+      # Does it make new connection every time?
+      # Does it keep the same connection open?
+      @connection = Faraday.new(url: base_url) { |connection|
+        # This content type works for Github like json standard too
+        connection.response :json, content_type: /\bjson$/
+      }
+      # TODO: How do I make sure connection is not being reused? Should it be reused?
+      # How can I make sure connection is closed & I'm not leaving any open connection behind?
     end
 
-    def do_request(endpoint:, method:, body: {}, opts: {}, headers: {})
-      uri = create_uri(endpoint, opts)
-      http = create_http(uri)
-      request = create_request(uri, method: method, body: body, headers: headers)
-      http.request(request)
+    def make_request(endpoint:, method:, body: {}, params: {}, headers: {})
+      # How do I efficiently make all kinds of requests, without any code repetition
+      # I can copy paste things from Faraday but that might be not good
+
+      unless method.is_a?(Symbol)
+        raise ArgumentError, "Invalid method type. Expected Symbol, found #{method.class}"
+      end
+
+      unless METHODS.include?(method)
+        raise ArgumentError, "unknown http method: #{method}"
+      end
+
+      # Is it cool?
+      @method = method
+      @endpoint = endpoint
+      @headers = headers
+      @body = body
+      @params = params
+
+      if method_with_body?
+        run_request_with_body
+      else
+        run_request_with_params
+      end
+
+      # Run it inside block & close connection
+      # @connection.close
+      response
     end
 
     private
 
-    def create_uri(endpoint, opts = {})
-      url = "#{@base_url}/#{endpoint}#{opts_url(opts)}"
-      URI(url)
+    def method_with_body?
+      METHODS_WITH_BODY.include?(@method)
     end
 
-    def create_http(uri)
-      http = Net::HTTP.new(uri.host, uri.port)
-      http.use_ssl = true if @use_ssl
-      http
+    def method_with_params?
+      METHODS_WITH_PARAMS.include?(@method)
     end
 
-    def create_request(uri, method:, body: nil, headers: {})
-      request = "Net::HTTP::#{method.capitalize}".constantize.new(uri)
-      request = add_headers(request, headers)
-      add_body(request, body)
+    def run_request_with_body
+      @connection.run_request(@method, @endpoint, @body, @headers)
     end
 
-    def opts_url(opts)
-      url = ""
-      if opts.present?
-        url = "?"
-        opts.each do |key, value|
-          url += "#{key}=#{value}&"
-        end
-      end
-      url
-    end
-
-    def add_headers(request, headers = {})
-      headers.each do |key, value|
-        request[key] = value
-      end
-      request
-    end
-
-    def add_body(request, body = nil)
-      if body.present?
-        request["Content-Type"] = "application/json"
-        request.body = body.to_json
-      end
-      request
+    def run_request_with_params
+      @connection.params = @params
+      @connection.run_request(@method, @endpoint, nil, @headers)
     end
   end
 end
