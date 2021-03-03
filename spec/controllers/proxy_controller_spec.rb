@@ -72,7 +72,7 @@ RSpec.describe ProxyController, "as Github Proxy" do
         # setup
         endpoint = "user/repos"
         request_headers = FactoryBot.build(:headers_with_auth_token)
-        github_endpoint = github_api_base_url + "/" + endpoint
+        github_url = github_api_base_url + "/" + endpoint
         request_body = {
           name: Faker::FunnyName.name
         }.to_json
@@ -84,7 +84,7 @@ RSpec.describe ProxyController, "as Github Proxy" do
         post :index, params: {path: endpoint}, body: request_body
 
         # expect
-        expect(a_request(:post, github_endpoint)
+        expect(a_request(:post, github_url)
                  .with(headers: request_headers, body: request_body)).to have_been_made.once
       end
     end
@@ -94,10 +94,10 @@ RSpec.describe ProxyController, "as Github Proxy" do
     context "on a user's behalf with given auth token and body" do
       it "make request to Github API endpoint with correct headers and body" do
         # setup
-        owner_endpoint = FactoryBot.build(:endpoint, {nesting_level: 2})
-        endpoint = "repos/#{owner_endpoint}"
+        repo_endpoint = FactoryBot.build(:endpoint, {nesting_level: 2})
+        endpoint = "repos/#{repo_endpoint}"
         request_headers = FactoryBot.build(:headers_with_auth_token)
-        github_endpoint = github_api_base_url + "/" + endpoint
+        github_url = github_api_base_url + "/" + endpoint
         request_body = {
           name: Faker::FunnyName.name,
           description: Faker::Quote.famous_last_words
@@ -110,7 +110,7 @@ RSpec.describe ProxyController, "as Github Proxy" do
         patch :index, params: {path: endpoint}, body: request_body
 
         # expect
-        expect(a_request(:patch, github_endpoint)
+        expect(a_request(:patch, github_url)
                  .with(headers: request_headers, body: request_body)).to have_been_made.once
       end
     end
@@ -120,10 +120,10 @@ RSpec.describe ProxyController, "as Github Proxy" do
     context "on a user's behalf with given auth token and body" do
       it "make request to Github API endpoint with correct headers and body" do
         # setup
-        owner_endpoint = FactoryBot.build(:endpoint, {nesting_level: 2})
-        endpoint = "repos/#{owner_endpoint}/topics"
+        repo_endpoint = FactoryBot.build(:endpoint, {nesting_level: 2})
+        endpoint = "repos/#{repo_endpoint}/topics"
         request_headers = FactoryBot.build(:headers_with_auth_token)
-        github_endpoint = github_api_base_url + "/" + endpoint
+        github_url = github_api_base_url + "/" + endpoint
         request_body = {
           names: Faker::Lorem.words(number: 4)
         }.to_json
@@ -135,7 +135,7 @@ RSpec.describe ProxyController, "as Github Proxy" do
         put :index, params: {path: endpoint}, body: request_body
 
         # expect
-        expect(a_request(:put, github_endpoint)
+        expect(a_request(:put, github_url)
                  .with(headers: request_headers, body: request_body)).to have_been_made.once
       end
     end
@@ -145,10 +145,10 @@ RSpec.describe ProxyController, "as Github Proxy" do
     context "on a user's behalf with given auth token" do
       it "make request to Github API endpoint with correct headers" do
         # setup
-        owner_endpoint = FactoryBot.build(:endpoint, {nesting_level: 2})
-        endpoint = "repos/#{owner_endpoint}/vulnerability-alerts"
+        repo_endpoint = FactoryBot.build(:endpoint, {nesting_level: 2})
+        endpoint = "repos/#{repo_endpoint}/vulnerability-alerts"
         request_headers = FactoryBot.build(:headers_with_auth_token)
-        github_endpoint = github_api_base_url + "/" + endpoint
+        github_url = github_api_base_url + "/" + endpoint
 
         # test
         request_headers.each do |key, value|
@@ -157,7 +157,7 @@ RSpec.describe ProxyController, "as Github Proxy" do
         put :index, params: {path: endpoint}
 
         # expect
-        expect(a_request(:put, github_endpoint)
+        expect(a_request(:put, github_url)
                  .with(headers: request_headers)).to have_been_made.once
       end
     end
@@ -167,10 +167,10 @@ RSpec.describe ProxyController, "as Github Proxy" do
     context "on a user's behalf with given auth token" do
       it "make request to Github API endpoint with correct headers" do
         # setup
-        owner_endpoint = FactoryBot.build(:endpoint, {nesting_level: 2})
-        endpoint = "repos/#{owner_endpoint}"
+        repo_endpoint = FactoryBot.build(:endpoint, {nesting_level: 2})
+        endpoint = "repos/#{repo_endpoint}"
         request_headers = FactoryBot.build(:headers_with_auth_token)
-        github_endpoint = github_api_base_url + "/" + endpoint
+        github_url = github_api_base_url + "/" + endpoint
 
         # test
         request_headers.each do |key, value|
@@ -179,7 +179,7 @@ RSpec.describe ProxyController, "as Github Proxy" do
         delete :index, params: {path: endpoint}
 
         # expect
-        expect(a_request(:delete, github_endpoint)
+        expect(a_request(:delete, github_url)
                  .with(headers: request_headers)).to have_been_made.once
       end
     end
